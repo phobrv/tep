@@ -29,7 +29,7 @@ for dirInfo in os.walk('../'):
     if fdName not in ignore_folder and fdName != '':
         created_at = handleCreatedAt(fdName)
         for img in dirInfo[2]:
-            thumb = "{}/{}".format(dirInfo[0].replace("../", ""), img)
+            thumb = "/{}/{}".format(dirInfo[0].replace("../", ""), img)
             title = hashlib.md5(thumb.encode('utf-8')).hexdigest()
             payload = json.dumps({
                 "title": title,
