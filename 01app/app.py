@@ -37,7 +37,7 @@ def handleCreatedAt(createStr: str):
 
 
 def create_thumb(path: str, thumb: str):
-    size = (256, 256)
+    size = (128, 128)
     pathThumb = "../01thumbs/{}.png".format(thumb)
     with Image.open(path) as im:
         im.thumbnail(size)
