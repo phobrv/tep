@@ -12,6 +12,17 @@ git_link = "https://raw.githubusercontent.com/phobrv/tep/main"
 print(hashlib.md5("whatever your string is".encode('utf-8')).hexdigest())
 
 
+def test():
+    payload = json.dumps({
+        "title": "title11",
+        "slug": "title11",
+        "thumb": "thumb",
+        "excerpt": git_link,
+        "created_at": "2020-08-18 00:00:00"
+    })
+    insert(payload)
+
+
 def handleFolderName(name: str):
     return name.replace("../", "").split("/")[0]
 
@@ -24,18 +35,22 @@ def handleCreatedAt(createStr: str):
     return createStr
 
 
-for dirInfo in os.walk('../'):
-    fdName = handleFolderName(dirInfo[0])
-    if fdName not in ignore_folder and fdName != '':
-        created_at = handleCreatedAt(fdName)
-        for img in dirInfo[2]:
-            thumb = "/{}/{}".format(dirInfo[0].replace("../", ""), img)
-            title = hashlib.md5(thumb.encode('utf-8')).hexdigest()
-            payload = json.dumps({
-                "title": title,
-                "slug": title,
-                "thumb": thumb,
-                "excerpt": git_link,
-                "created_at": str(created_at)
-            })
-            insert(payload)
+def insertImg():
+    for dirInfo in os.walk('../'):
+        fdName = handleFolderName(dirInfo[0])
+        if fdName not in ignore_folder and fdName != '':
+            created_at = handleCreatedAt(fdName)
+            for img in dirInfo[2]:
+                thumb = "/{}/{}".format(dirInfo[0].replace("../", ""), img)
+                title = hashlib.md5(thumb.encode('utf-8')).hexdigest()
+                payload = json.dumps({
+                    "title": title,
+                    "slug": title,
+                    "thumb": thumb,
+                    "excerpt": git_link,
+                    "created_at": str(created_at)
+                })
+                insert(payload)
+
+
+insertImg()
