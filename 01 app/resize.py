@@ -12,6 +12,7 @@ from os.path import exists
 ignore_img = ['.DS_Store']
 size2048 = (2048, 2048)
 size1920 = (1920, 1920)
+size800 = (800, 800)
 
 
 def resize(imgPath: str, imgName: str, imgSize, imgFolder):
@@ -39,4 +40,4 @@ def main(size, folder):
                     print(resize(imgPath, imgName, size, folder))
 
 
-main(size1920, '1920')
+main(size800, '800')
