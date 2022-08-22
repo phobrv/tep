@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "Bash version ${BASH_VERSION}..."
+
+for i in {0..100}
+do
+  echo "-----go to cooky_images and push github"
+  cd /Volumes/PhoData/tep 
+  git pull
+  git add .
+  git commit -m "update"
+  git push
+  echo "-----go to image source and copy to cooky_images"
+  cd /Volumes/PhoData/1920
+  find  . | head -n 100 | xargs -I {} mv -v {} /Volumes/PhoData/tep/1920 
+done
