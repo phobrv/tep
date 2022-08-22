@@ -7,54 +7,92 @@ import os
 import hashlib
 from datetime import datetime
 from PIL import Image
+from os.path import exists
 
-ignore_folder = ['.git', '01 app', '01thumbs']
+
+ignore_img = ['.DS_Store']
 git_link = "https://raw.githubusercontent.com/phobrv/tep/main"
-print(hashlib.md5("whatever your string is".encode('utf-8')).hexdigest())
+
+size1920 = (1920, 1920)
+size800 = (800, 800)
+sizeThumb = (256, 256)
+fmts = ("%d %B %Y", "%B %d, %Y")
 
 
 def handleFolderName(name: str):
-    return name.replace("../", "").split("/")[0]
+    return name.replace("../source/", "")
+
+
+def handleDateFormat(dateStr: str):
+    for fmt in fmts:
+        try:
+            return datetime.strptime(dateStr, fmt)
+        except Exception as e:
+            pass
 
 
 def handleCreatedAt(createStr: str):
-    nameSplit = createStr.split(",")
-    if len(nameSplit) == 1:
-        createStr = datetime.strptime(createStr, "%d %B %Y")
-    elif(len(nameSplit) > 2):
-        createStr = "{}, {}".format(nameSplit[-2].strip(), nameSplit[-1].strip())
-        createStr = datetime.strptime(createStr, "%B %d, %Y")
+    dateOut = handleDateFormat(createStr)
+    if dateOut is None:
+        nameSplit = createStr.split(",")
+        if(len(nameSplit) > 2):
+            createStr = "{}, {}".format(nameSplit[-2].strip(), nameSplit[-1].strip())
+            dateOut = handleDateFormat(createStr)
+        if dateOut is None:
+            createStr = nameSplit[-1].strip()
+            dateOut = handleDateFormat(createStr)
+    return dateOut
 
-    return createStr
 
-
-def create_thumb(path: str, thumb: str):
-    size = (128, 128)
-    pathThumb = "../01thumbs/{}.png".format(thumb)
-    with Image.open(path) as im:
-        im.thumbnail(size)
-        im.save(pathThumb, "PNG")
-    return pathThumb.replace("..", "")
+def resize(imgPath: str, imgName: str, imgSize, imgFolder):
+    path = "../{}/{}.png".format(imgFolder, imgName)
+    if exists(path) == False:
+        with Image.open(imgPath) as im:
+            im.thumbnail(imgSize)
+            im.save(path, "PNG")
+        return path.replace("..", "")
+    else:
+        print(imgName, imgFolder, "exist")
 
 
 def insertImg():
-    for dirInfo in os.walk('../'):
+    for dirInfo in os.walk('../source'):
         fdName = handleFolderName(dirInfo[0])
-        if fdName not in ignore_folder and fdName != '':
+        if fdName != '':
             created_at = handleCreatedAt(fdName)
-            for img in dirInfo[2]:
-                content = "/{}/{}".format(dirInfo[0].replace("../", ""), img)
-                title = hashlib.md5(content.encode('utf-8')).hexdigest()
-                thumb = create_thumb("{}/{}".format(dirInfo[0], img), title)
-                payload = json.dumps({
-                    "title": title,
-                    "slug": title,
-                    "thumb": thumb,
-                    "content": content,
-                    "excerpt": git_link,
-                    "created_at": str(created_at)
-                })
-                insert(payload)
+            if created_at is not None:
+                for img in dirInfo[2]:
+                    if img not in ignore_img:
+                        content = "/{}/{}".format(dirInfo[0].replace("../", ""), img)
+                        imgName = hashlib.md5(content.encode('utf-8')).hexdigest()
+                        imgPath = "{}/{}".format(dirInfo[0], img)
+                        thumb = imgName+".png"
+                        resize(imgPath, imgName, size1920, '1920')
+                        resize(imgPath, imgName, size800, '800')
+                        resize(imgPath, imgName, sizeThumb, 'thumbs')
+                # for dirInfo in dirs[1]:
+                #     fdName = handleFolderName(dirInfo)
+
+                #     if fdName != '':
+                #         created_at = handleCreatedAt(fdName)
+                #         for img in dirInfo[2]:
+                #             if img not in ignore_img:
+                #                 content = "/source/{}/{}".format(dirInfo[0].replace("../", ""), img)
+                #                 imgName = hashlib.md5(content.encode('utf-8')).hexdigest()
+                #                 imgPath = "{}/{}".format(dirInfo[0], img)
+                #                 thumb = imgName+".png"
+                #                 # resize(imgPath, imgName, size1920, '1920')
+                #                 # resize(imgPath, imgName, size800, '800')
+                #                 # resize(imgPath, imgName, sizeThumb, 'thumbs')
+                #                 payload = json.dumps({
+                #                     "title": imgName,
+                #                     "slug": imgName,
+                #                     "thumb": thumb,
+                #                     "content": content,
+                #                     "excerpt": git_link,
+                #                     "created_at": str(created_at)
+                #                 })
+                #                 # insert(payload)
 
 
 insertImg()
