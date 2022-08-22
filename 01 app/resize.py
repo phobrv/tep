@@ -26,15 +26,15 @@ def handleFolderName(name: str):
     return name.replace("../", "").split("/")[0]
 
 
-def main():
-    for dirInfo in os.walk('../'):
+def main(size, folder):
+    for dirInfo in os.walk('../source'):
         fdName = handleFolderName(dirInfo[0])
         if fdName not in ignore_folder and fdName != '':
             for img in dirInfo[2]:
                 content = "/{}/{}".format(dirInfo[0].replace("../", ""), img)
                 imgName = hashlib.md5(content.encode('utf-8')).hexdigest()
                 imgPath = "{}/{}".format(dirInfo[0], img)
-                print(resize(imgPath, imgName, size1920, '1920'))
+                print(resize(imgPath, imgName, size, folder))
 
 
-main()
+main(size1920, '1920')
