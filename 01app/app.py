@@ -13,26 +13,18 @@ git_link = "https://raw.githubusercontent.com/phobrv/tep/main"
 print(hashlib.md5("whatever your string is".encode('utf-8')).hexdigest())
 
 
-def test():
-    payload = json.dumps({
-        "title": "title11",
-        "slug": "title11",
-        "thumb": "thumb",
-        "excerpt": git_link,
-        "created_at": "2020-08-18 00:00:00"
-    })
-    insert(payload)
-
-
 def handleFolderName(name: str):
     return name.replace("../", "").split("/")[0]
 
 
 def handleCreatedAt(createStr: str):
     nameSplit = createStr.split(",")
-    if(len(nameSplit) > 2):
+    if len(nameSplit) == 1:
+        createStr = datetime.strptime(createStr, "%d %B %Y")
+    elif(len(nameSplit) > 2):
         createStr = "{}, {}".format(nameSplit[-2].strip(), nameSplit[-1].strip())
-    createStr = datetime.strptime(createStr, "%B %d, %Y")
+        createStr = datetime.strptime(createStr, "%B %d, %Y")
+
     return createStr
 
 
@@ -65,4 +57,4 @@ def insertImg():
                 insert(payload)
 
 
-insertImg()
+# insertImg()
