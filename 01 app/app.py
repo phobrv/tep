@@ -8,7 +8,7 @@ import hashlib
 from datetime import datetime
 from PIL import Image
 
-ignore_folder = ['.git', '01app', '01thumbs']
+ignore_folder = ['.git', '01 app', '01thumbs']
 git_link = "https://raw.githubusercontent.com/phobrv/tep/main"
 print(hashlib.md5("whatever your string is".encode('utf-8')).hexdigest())
 
@@ -57,4 +57,4 @@ def insertImg():
                 insert(payload)
 
 
-# insertImg()
+insertImg()
